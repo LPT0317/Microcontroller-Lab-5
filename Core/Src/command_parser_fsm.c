@@ -8,7 +8,6 @@
 #include "command_parser_fsm.h"
 
 /* Define State */
-#define COMMAND_INIT 0
 #define COMMAND_BEGIN 1
 #define COMMAND_WAIT 2
 #define WAIT_S 11
@@ -33,12 +32,6 @@ void command_parser_fsm(void)
 	  index_command = 0;
   switch(command_state)
   {
-//  case COMMAND_INIT:
-//	  index_command = 0;
-//	  command_state = COMMAND_BEGIN;
-//	  command_data = NO_COMMAND;
-//	  command_flag = 0;
-//	  break;
   case COMMAND_BEGIN:
 	  /*
 	   * command: "!" -> next state

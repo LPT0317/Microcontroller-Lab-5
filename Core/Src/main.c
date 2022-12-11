@@ -24,6 +24,8 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include "command_parser_fsm.h"
+#include "uart_communiation_fsm.h"
+#include "timer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -109,12 +111,13 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  HAL_TIM_Base_Start_IT(&htim2);
   HAL_UART_Receive_IT(&huart2, &temp, 1);
   HAL_ADC_Start(&hadc1);
-//  uint32_t ADC_value = 0;
+
   /* USER CODE END 2 */
   char str[50];
-  HAL_UART_Transmit(&huart2, str, sprintf(str, "%s", "Type Command:\r"), 1000);
+  HAL_UART_Transmit(&huart2, (void *)str, sprintf(str, "%s", "Type Command:\r"), 1000);
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -124,19 +127,7 @@ int main(void)
 		  command_parser_fsm();
 		  buffer_flag = 0;
 	  }
-	  if(command_flag == 1)
-	  {
-		  command_flag = 0;
-		  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-		  if(command_data == RST)
-			  HAL_UART_Transmit(&huart2, str, sprintf(str, "%s", "\rRST\r"), 1000);
-		  if(command_data == OK)
-			  HAL_UART_Transmit(&huart2, str, sprintf(str, "%s", "\rOK\r"), 1000);
-		  command_data = NO_COMMAND;
-	  }
-//	  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-//	  ADC_value = HAL_ADC_GetValue(&hadc1);
-//	  HAL_Delay(500);
+	  uart_communiation_fsm();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -334,7 +325,10 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	timerRun();
+}
 /* USER CODE END 4 */
 
 /**
